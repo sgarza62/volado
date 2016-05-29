@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.os.Handler;
 
 import java.util.Random;
 
@@ -15,6 +16,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int mFlipInterval = 30;
     private RelativeLayout mTap;
     private RelativeLayout mTails;
+    private Handler mDurationHandler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,39 +26,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mTap = (RelativeLayout) findViewById(R.id.tap);
         mTails = (RelativeLayout) findViewById(R.id.tails);
-
-        if (savedInstanceState != null) {
-            String currScreen = savedInstanceState.getString("currScreen", "tap");
-            if (currScreen.equals("tap")) {
-                mTap.setVisibility(View.VISIBLE);
-                mTails.setVisibility(View.GONE);
-            }
-
-            if (currScreen.equals("tails")) {
-                mTails.setVisibility(View.VISIBLE);
-                mTap.setVisibility(View.GONE);
-            }
-
-            if (currScreen.equals("heads")) {
-                mTap.setVisibility(View.GONE);
-                mTails.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        String currScreen;
-        if (mTap.getVisibility() == View.VISIBLE) {
-            currScreen = "tap";
-        } else if (mTails.getVisibility() == View.VISIBLE) {
-            currScreen = "tails";
-        } else {
-            currScreen = "heads";
-        }
-
-        outState.putString("currScreen", currScreen);
-        super.onSaveInstanceState(outState);
     }
 
     public void onClickFlip(View view) {
@@ -72,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         // add flips to the message queue, where the delayed millis grow quadratically per flip
         for (int i = 0; i < flips; i++) {
             final int currMultiplier = i;
-            new android.os.Handler().postDelayed(
+            mDurationHandler.postDelayed(
                     new Runnable() {
                         public void run() {
                             // just hide and show the overlaying tails screen
@@ -86,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     mFlipInterval * (currMultiplier * currMultiplier));
         }
 
+        // TODO: use Timer instead https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     @Override
