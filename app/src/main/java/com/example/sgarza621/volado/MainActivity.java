@@ -7,8 +7,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.os.Handler;
-
 import java.util.Random;
+
+// TODO: use Timer instead https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,12 +19,11 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout mTails;
     private Handler mDurationHandler = new Handler();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
         mTap = (RelativeLayout) findViewById(R.id.tap);
         mTails = (RelativeLayout) findViewById(R.id.tails);
     }
@@ -41,29 +41,29 @@ public class MainActivity extends AppCompatActivity {
 
         // add flips to the message queue, where the delayed millis grow quadratically per flip
         for (int i = 0; i < flips; i++) {
-            final int currMultiplier = i;
-            mDurationHandler.postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            // just hide and show the overlaying tails screen
-                            if (mTails.getVisibility() == View.VISIBLE) {
-                                mTails.setVisibility(View.GONE);
-                            } else {
-                                mTails.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    },
-                    mFlipInterval * (currMultiplier * currMultiplier));
+            mDurationHandler.postDelayed(flipRunnable, mFlipInterval * (i * i));
         }
 
-        // TODO: use Timer instead https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    }
-                },
-                mFlipInterval * flips * flips);
-    }
+        // schedule a reset for once the last flip is complete
+        mDurationHandler.postDelayed(resetFlipsRunnable, mFlipInterval * flips * flips);
+    };
+
+    private Runnable flipRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // just hide and show the overlaying tails screen
+            if (mTails.getVisibility() == View.VISIBLE) {
+                mTails.setVisibility(View.GONE);
+            } else {
+                mTails.setVisibility(View.VISIBLE);
+            }
+        }
+    };
+
+    private Runnable resetFlipsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        }
+    };
 }
