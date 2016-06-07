@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.os.Handler;
+
 import java.util.Random;
 
 // TODO: use Timer instead https://docs.oracle.com/javase/8/docs/api/java/util/Timer.html
@@ -46,9 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
         // schedule a reset for once the last flip is complete
         mDurationHandler.postDelayed(resetFlipsRunnable, mFlipInterval * flips * flips);
-    };
+    }
 
-    private Runnable flipRunnable = new Runnable() {
+    ;
+
+    protected Runnable flipRunnable = new Runnable() {
         @Override
         public void run() {
             // just hide and show the overlaying tails screen
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private Runnable resetFlipsRunnable = new Runnable() {
+    protected Runnable resetFlipsRunnable = new Runnable() {
         @Override
         public void run() {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
